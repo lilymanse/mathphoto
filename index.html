@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>수학자 인생네컷 부스</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app-container">
+
+        <section id="start-view" class="view active">
+            <div class="header">
+                <span class="sticker sticker-1">✏️</span>
+                <span class="sticker sticker-2">📐</span>
+                <h1>나와 닮은<br><span class="highlight">수학자 인생네컷</span></h1>
+                <p>10개의 질문으로 나의 수학적 성향을 분석하고,<br>닮은 수학자 프레임과 네 컷 사진을 남겨보세요! 📸</p>
+            </div>
+            <div class="main-visual">
+                <div class="character-circle">📸</div>
+            </div>
+            <button class="btn-main" onclick="startQuiz()">시작하기</button>
+        </section>
+
+        <section id="quiz-view" class="view">
+            <div class="progress-bar"><div id="progress"></div></div>
+            <div class="quiz-content">
+                <p class="q-count">Question <span id="q-number">1</span>/10</p>
+                <h2 id="q-text">질문 내용이 여기에 들어갑니다.</h2>
+                <div id="answer-buttons" class="answer-container"></div>
+            </div>
+        </section>
+
+        <section id="result-view" class="view">
+            <div class="result-card">
+                <span class="washi-tape tape-top"></span>
+                <p class="result-label">나의 수학자 유형은...</p>
+                <h2 id="result-name">가우스</h2>
+                <div class="result-img-wrap">
+                    <img id="result-img" src="" alt="수학자 캐릭터">
+                    <span id="result-badge" class="expression-badge">😊</span>
+                </div>
+                <p id="result-desc" class="result-desc">설명 내용</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn-primary" onclick="startPhotoBooth()">✨ 수학자 부스로 입장하기</button>
+                <button class="btn-secondary" onclick="location.reload()">다시 하기</button>
+            </div>
+        </section>
+
+        <section id="photo-view" class="view">
+            <div class="booth-header">
+                <h3>연속 촬영 진행 중 (<span id="shot-counter">1</span>/4)</h3>
+            </div>
+            <div class="camera-container">
+                <video id="webcam" autoplay playsinline></video>
+                <img id="frame-overlay" src="" alt="Frame Overlay">
+                <span id="live-badge" class="expression-badge live"></span>
+                <div id="countdown-display" style="display:none;">3</div>
+            </div>
+
+            <div class="camera-controls">
+                <p class="instruction" id="booth-instruction">아래 버튼을 누르면 3초 간격으로 4번 연속 촬영합니다!</p>
+                <button class="btn-capture-start" id="start-shot-btn" onclick="startFourShots()">▶️ 촬영 시작</button>
+                <button class="btn-back" onclick="backToResult()">뒤로가기</button>
+            </div>
+        </section>
+
+        <section id="review-view" class="view">
+            <div class="booth-header">
+                <h3>📷 마음에 드는 컷인가요?</h3>
+                <p class="instruction">별로인 컷은 다시 찍을 수 있어요!</p>
+            </div>
+            <div class="review-grid" id="review-grid-target"></div>
+            <div class="btn-group">
+                <button class="btn-main" onclick="goToMessageStep()">👍 이대로 좋아요</button>
+                <button class="btn-back" onclick="backToResult()">처음부터 다시 찍기</button>
+            </div>
+        </section>
+
+        <section id="message-view" class="view">
+            <div class="booth-header">
+                <h3>💌 한 줄 메시지 남기기</h3>
+                <p class="instruction">네 컷 사진 아래에 들어갈 짧은 메시지를 적어주세요 (선택)</p>
+            </div>
+            <div class="message-box">
+                <textarea id="message-input" maxlength="26" placeholder="예) 수학이랑 친해지는 중 :)"></textarea>
+                <p class="char-count"><span id="char-count-num">0</span>/26</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn-main" onclick="goToOutputChoice()">다음</button>
+                <button class="btn-back" onclick="setActiveView('review-view')">뒤로가기</button>
+            </div>
+        </section>
+
+        <section id="output-choice-view" class="view">
+            <div class="booth-header">
+                <h3>🎁 어떻게 받아 갈까요?</h3>
+            </div>
+            <div class="output-choice-group">
+                <button class="output-choice-btn" onclick="chooseOutput('print')">
+                    <span class="oc-emoji">🖨️</span>
+                    <span class="oc-title">프린터로 출력</span>
+                    <span class="oc-sub">바로 인쇄해서 가져가요</span>
+                </button>
+                <button class="output-choice-btn disabled" disabled>
+                    <span class="oc-emoji">📱</span>
+                    <span class="oc-title">QR로 받기</span>
+                    <span class="oc-sub">준비 중이에요, 곧 만나요!</span>
+                </button>
+            </div>
+            <button class="btn-back" onclick="setActiveView('message-view')">뒤로가기</button>
+        </section>
+
+        <section id="print-view" class="view">
+            <div class="print-instruction">
+                <h3>🎉 인생네컷 완성!</h3>
+                <p>아래 출력 버튼을 누르면 인쇄할 수 있습니다.</p>
+            </div>
+
+            <div class="four-cut-print-area" id="four-cut-box">
+                <div class="photos-grid" id="photos-grid-target">
+                    <div class="photo-slot"><div class="slot-idx">1</div></div>
+                    <div class="photo-slot"><div class="slot-idx">2</div></div>
+                    <div class="photo-slot"><div class="slot-idx">3</div></div>
+                    <div class="photo-slot"><div class="slot-idx">4</div></div>
+                </div>
+                <p id="print-message" class="print-message"></p>
+                <div class="frame-bottom-bar">
+                    <img id="print-math-avatar" src="" alt="Avatar">
+                    <div class="frame-text-info">
+                        <span id="print-frame-title">가우스 부스</span>
+                        <small>Mathematics Network 2026</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-print" onclick="printFourCut()">🖨️ 인쇄하기 / PDF 저장</button>
+                <button class="btn-secondary" onclick="location.reload()">처음으로 가기</button>
+            </div>
+        </section>
+
+    </div>
+
+    <canvas id="hidden-canvas" style="display:none;"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
