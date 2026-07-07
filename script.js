@@ -193,6 +193,8 @@ async function startPhotoBooth() {
             audio: false
         });
         video.srcObject = stream;
+        video.muted = true;
+        await video.play().catch(() => {});
     } catch (err) {
         alert("카메라 연결 실패! 권한을 확인해주세요.");
         backToResult();
@@ -357,6 +359,8 @@ async function retakeShot(index) {
             audio: false
         });
         video.srcObject = stream;
+        video.muted = true;
+        await video.play().catch(() => {});
     } catch (err) {
         alert("카메라 연결 실패! 권한을 확인해주세요.");
         setActiveView('review-view');
@@ -483,8 +487,11 @@ function buildFourCutFrame() {
     // 하단 인포 바 세팅
     document.getElementById('print-math-avatar').src = results[finalResultType].img;
     document.getElementById('print-frame-title').innerText = results[finalResultType].name;
-    document.getElementById('print-message').innerText = userMessage;
-    document.getElementById('print-message').style.display = userMessage ? 'block' : 'none';
+
+    const msg = (userMessage || (messageInput ? messageInput.value.trim() : ''));
+    const msgEl = document.getElementById('print-message');
+    msgEl.innerText = msg;
+    msgEl.style.display = msg ? 'block' : 'none';
 
     const grid = document.getElementById('photos-grid-target');
     grid.innerHTML = ''; // 초기화

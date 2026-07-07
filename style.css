@@ -282,8 +282,17 @@ button { font-family: var(--font-display); cursor: pointer; }
         print-color-adjust: exact;
     }
 
-    #app-container, .print-instruction, .btn-group, #hidden-canvas, .view {
-        display: none !important;
+    /* 인쇄 대상(.four-cut-print-area)을 제외한 모든 요소를 숨김.
+       주의: display:none은 자손까지 렌더링 트리에서 제거되어 버리므로
+       (부모가 display:none이면 자식에 display:flex를 줘도 안 보임),
+       반드시 visibility로 처리하고 인쇄 대상만 다시 visible로 되돌린다. */
+    body * {
+        visibility: hidden;
+    }
+
+    .four-cut-print-area,
+    .four-cut-print-area * {
+        visibility: visible;
     }
 
     .four-cut-print-area {
