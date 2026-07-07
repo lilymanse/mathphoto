@@ -210,9 +210,38 @@ function applyLiveExpression() {
     return expr;
 }
 
+// 비디오가 실제로 프레임을 그릴 준비가 됐는지 확인 (최대 2초 대기)
+function waitForVideoReady(maxWaitMs = 2000) {
+    return new Promise((resolve) => {
+        const start = Date.now();
+        function check() {
+            if (video.videoWidth > 0 && video.videoHeight > 0) {
+                resolve(true);
+                return;
+            }
+            if (Date.now() - start > maxWaitMs) {
+                resolve(false);
+                return;
+            }
+            requestAnimationFrame(check);
+        }
+        check();
+    });
+}
+
 // 4회 연속 촬영 자동 루프 함수
-function startFourShots() {
+async function startFourShots() {
     document.getElementById('start-shot-btn').style.display = 'none'; // 촬영 중 버튼 숨기기
+
+    // 사용자 클릭(제스처) 시점에 다시 한번 재생 시도 + 준비 대기
+    await video.play().catch(() => {});
+    const ready = await waitForVideoReady();
+    if (!ready) {
+        alert("카메라가 아직 준비되지 않았어요. 다시 시도해주세요!");
+        document.getElementById('start-shot-btn').style.display = 'block';
+        return;
+    }
+
     let currentShot = 1;
 
     function captureLoop() {
@@ -372,6 +401,20 @@ async function retakeShot(index) {
 
 function retakeSingleShot(index) {
     document.getElementById('start-shot-btn').style.display = 'none';
+
+    (async () => {
+        await video.play().catch(() => {});
+        const ready = await waitForVideoReady();
+        if (!ready) {
+            alert("카메라가 아직 준비되지 않았어요. 다시 시도해주세요!");
+            document.getElementById('start-shot-btn').style.display = 'block';
+            return;
+        }
+        runRetakeCountdown(index);
+    })();
+}
+
+function runRetakeCountdown(index) {
     let count = 3;
     countdownDisplay.innerText = count;
     countdownDisplay.style.display = 'flex';
