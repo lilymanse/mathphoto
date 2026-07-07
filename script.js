@@ -186,6 +186,7 @@ async function startPhotoBooth() {
     document.getElementById('start-shot-btn').innerText = '▶️ 촬영 시작';
     document.getElementById('shot-counter').innerText = '1';
     applyLiveExpression();
+    setCamStatus('카메라 연결 중...');
 
     try {
         stream = await navigator.mediaDevices.getUserMedia({
@@ -195,10 +196,25 @@ async function startPhotoBooth() {
         video.srcObject = stream;
         video.muted = true;
         await video.play().catch(() => {});
+
+        const track = stream.getVideoTracks()[0];
+        video.addEventListener('loadedmetadata', () => {
+            setCamStatus(`카메라 연결됨 (${video.videoWidth}x${video.videoHeight})`);
+        }, { once: true });
+        setTimeout(() => {
+            if (video.videoWidth === 0) {
+                setCamStatus(`⚠️ 신호 없음 — 다른 앱이 카메라를 쓰고 있을 수 있어요 (${track ? track.label : '카메라'})`);
+            }
+        }, 2500);
     } catch (err) {
         alert("카메라 연결 실패! 권한을 확인해주세요.");
         backToResult();
     }
+}
+
+function setCamStatus(text) {
+    const el = document.getElementById('cam-status');
+    if (el) el.innerText = text;
 }
 
 // 촬영 화면의 워터마크 캐릭터에도 매 컷 랜덤 표정을 미리보기로 보여줌
